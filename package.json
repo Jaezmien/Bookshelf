@@ -1,0 +1,35 @@
+{
+	"name": "bookshelf",
+	"author": "Jaezmien Naejara",
+	"license": "GPL",
+	"private": true,
+	"version": "0.1.0",
+	"scripts": {
+		"dev": "vite",
+		"build": "vue-tsc --noEmit && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"debounce": "^1.2.1",
+		"feather-icons": "^4.29.0",
+		"gsap": "^3.10.4",
+		"node-html-parser": "^5.3.3",
+		"object-hash": "^3.0.0",
+		"path-browserify": "^1.0.1",
+		"pinia": "^2.0.14",
+		"vue": "^3.2.25",
+		"vue-router": "4"
+	},
+	"devDependencies": {
+		"@types/debounce": "^1.2.1",
+		"@types/feather-icons": "^4.7.0",
+		"@types/object-hash": "^2.2.1",
+		"@types/path-browserify": "^1.0.0",
+		"@vitejs/plugin-vue": "^2.3.3",
+		"sass": "^1.52.3",
+		"typescript": "^4.5.4",
+		"vite": "^2.9.9",
+		"vite-plugin-pwa": "^0.12.0",
+		"vue-tsc": "^0.34.7"
+	}
+}
