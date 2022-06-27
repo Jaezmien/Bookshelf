@@ -14,7 +14,7 @@ export default defineConfig({
 				name: 'Bookshelf',
 				short_name: 'Bookshelf',
 				description: 'A small FiMFiction story reader',
-				theme_color: '#ffffff',
+				theme_color: '#121317',
 				orientation: 'portrait',
 				display: 'standalone',
 				scope: '/',
