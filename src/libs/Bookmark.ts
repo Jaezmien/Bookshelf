@@ -7,8 +7,14 @@ export interface Bookmark {
 let bookmarks: Bookmark[] | null = null
 function get_store() {
 	if (bookmarks !== null) return
-	if (!localStorage.getItem('bookmark')) localStorage.setItem('bookmark', JSON.stringify([]))
+	if (!localStorage.getItem('bookmark')) {
+		bookmarks = []
+		set_store()
+	}
 	bookmarks = JSON.parse(localStorage.getItem('bookmark')!) as Bookmark[]
+}
+function set_store() {
+	localStorage.setItem('bookmark', JSON.stringify(bookmarks))
 }
 
 function create_bookmark(uuid: string, chapterIndex: number = 0, elementIndex: number = -1): Bookmark {
@@ -25,7 +31,7 @@ export function delete_bookmark(uuid: string) {
 	const index = bookmarks!.findIndex((b) => b.uuid == uuid)
 	if (index > -1) bookmarks!.splice(index, 1)
 
-	localStorage.setItem('bookmark', JSON.stringify(bookmarks))
+	set_store()
 }
 
 export function save_bookmark(uuid: string, chapterIndex: number, elementIndex: number) {
@@ -38,7 +44,7 @@ export function save_bookmark(uuid: string, chapterIndex: number, elementIndex: 
 		bookmarks![index].elementIndex = elementIndex
 	}
 
-	localStorage.setItem('bookmark', JSON.stringify(bookmarks))
+	set_store()
 }
 export function load_bookmark(uuid: string) {
 	get_store()
