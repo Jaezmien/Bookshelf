@@ -121,7 +121,7 @@ onUnmounted(() => {
 			<div id="chapter-name"
 				 v-show="showChapter"
 				 @dblclick="$emit('showChapterModal')">
-				<h1>{{ chapterInfo.Name }}</h1>
+				<h3>{{ navSticky ? '&nbsp;' : chapterInfo.Name }}</h3>
 			</div>
 		</FadeTransition>
 
@@ -151,7 +151,7 @@ nav {
 	display: grid;
 	grid-template-areas: "previous name next";
 	grid-template-rows: auto;
-	grid-template-columns: 1fr 4fr 1fr;
+	grid-template-columns: 1fr 6fr 1fr;
 	place-items: center;
 
 
@@ -177,9 +177,14 @@ nav {
 		display: grid;
 		place-items: center;
 
-		h1 {
-			padding: 0 1rem;
+		padding: 1rem 1rem;
+
+		>* {
+			min-height: 1rem;
+			margin: 0;
 			text-align: center;
+			user-select: none;
+			cursor: pointer;
 		}
 	}
 
