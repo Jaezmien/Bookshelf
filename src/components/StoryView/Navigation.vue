@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { FiMStoryType, FiMFormatType } from '@/libs/FiMParser';
+import { FiMStoryType } from '@/libs/FiMParser';
 import { BookshelfChapterInfo } from '@/types';
-import { inject, onMounted, onUnmounted, PropType, ref, nextTick, computed, reactive, watch } from 'vue';
+import { onMounted, onUnmounted, PropType, ref, nextTick, computed, reactive, watch } from 'vue';
 import FadeTransition from '@/transitions/FadeTransition.vue';
 import FeatherIcon from '../FeatherIcon.vue';
 import gsap from "gsap";

@@ -11,7 +11,6 @@ import Info from './Info.vue';
 import PageTransition from '@/transitions/PageTransition.vue';
 import Navigation from './Navigation.vue';
 import { Bookmark, delete_bookmark, save_bookmark } from '@/libs/Bookmark';
-import debounce from 'debounce'
 import { BookNotification } from '@/symbols';
 
 const props = defineProps({
@@ -153,6 +152,8 @@ if (props.bookmark) {
 			}
 		}, { immediate: true })
 	}
+
+	const debounce = (await import('debounce')).default
 
 	WatchStoryLastChild(contentContainer, debounce((el, i) => {
 		if (!loadedBookmark.value) return

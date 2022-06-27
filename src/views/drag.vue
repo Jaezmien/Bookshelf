@@ -25,8 +25,8 @@ function load_story(files: DropLoaderResult[]) {
 	const [filename, storyFile] = files[0]
 
 	load_file_as_text(storyFile).then(
-		event => {
-			story.value = ParseFiMStory(filename, (event.target!.result) as string)
+		async event => {
+			story.value = await ParseFiMStory(filename, (event.target!.result) as string)
 			storyFilename.value = filename
 			isInMenu.value = false
 		}

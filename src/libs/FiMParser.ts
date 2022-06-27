@@ -1,5 +1,3 @@
-import { parse as parseHTML } from 'node-html-parser'
-
 export enum FiMFormatType {
 	FIMFICTION_ARROW = 1,
 	FIMFICTION_SLASH = 2,
@@ -61,8 +59,11 @@ function objectify_html(o: HTMLElement, depth: number = 1): FiMHTMLTree | string
 	return tree
 }
 
-function ParseFiMHTMLStory(content: string, Story: FiMStoryFull): FiMStoryFull {
-	const dom = parseHTML(content)
+async function ParseFiMHTMLStory(content: string, Story: FiMStoryFull) {
+	const { parse, default: parse2 } = await import('node-html-parser')
+	// Really funny hack: parse does not exist on prod for some reason.
+	// Solution? Call it and the default one and hope to Luna that either one exists.
+	const dom = (parse || parse2)(content)
 
 	if (!dom.querySelector('header h1 a') && !dom.querySelector('header h2 a')) {
 		// FIXME: This probably looks cursed? Maybe find a better way to do this.
@@ -138,7 +139,7 @@ function ParseFiMHTMLStory(content: string, Story: FiMStoryFull): FiMStoryFull {
 	return Story
 }
 
-export function ParseFiMStory(file: string, content: string): FiMStoryFull | FiMStoryRaw {
+export async function ParseFiMStory(file: string, content: string): Promise<FiMStoryFull | FiMStoryRaw> {
 	let Story: FiMStoryFull = {
 		Format: FiMFormatType.UNKNOWN,
 		Title: '',

@@ -1,6 +1,5 @@
 import { FiMFormatType, FiMStoryChapters, FiMStoryType } from '@/libs/FiMParser'
 import { defineStore } from 'pinia'
-import { MD5 } from 'object-hash' // because crypto-browserify has not been updated, and a DefinitelyTyped repo does not exist. oof.
 
 const FORCE_DISABLE_INDEXEDDB = false
 const BOOKSHELF_DB_VERSION = 1
@@ -102,12 +101,15 @@ export const useFileStore = defineStore('files', {
 			return JSON.parse(localStorage.getItem('stories') || '[]') as LSData[]
 		},
 		add_file(filename: string, FiMStory: FiMStoryType) {
-			return new Promise<string>((res, rej) => {
+			return new Promise<[string, boolean]>(async (res, rej) => {
 				if (!this.idb_loaded) rej('Tried to add files while IDB has not been loaded yet.')
 
 				let local: LSData
 				let idb: IDBStory
 				const timestamp = Date.now()
+
+				// because crypto-browserify has not been updated, and a DefinitelyTyped repo does not exist. oof.
+				const { MD5 } = await import('object-hash')
 
 				if (FiMStory.Format === FiMFormatType.RAW) {
 					const uuid = MD5(filename)
@@ -147,12 +149,12 @@ export const useFileStore = defineStore('files', {
 				if (i > -1) {
 					this.load_file(local.StoryUUID)
 						.then(([, _idb]) => {
-							if (_idb.ContentHash === idb.ContentHash) return res(local.StoryUUID)
+							if (_idb.ContentHash === idb.ContentHash) return res([local.StoryUUID, true])
 
 							const storyStore = this.db!.transaction(['stories'], 'readwrite').objectStore('stories')
 							const req = storyStore.put(idb) // Update
 
-							req.onsuccess = (e) => res(local.StoryUUID)
+							req.onsuccess = (e) => res([local.StoryUUID, true])
 							req.onerror = (e) => rej(e)
 						})
 						.catch(rej)
@@ -169,7 +171,7 @@ export const useFileStore = defineStore('files', {
 
 					const storyStore = dbTransc.objectStore('stories')
 					const transReq = storyStore.add(idb) // Request a transaction to the objectstore
-					transReq.onsuccess = (e) => res(local.StoryUUID)
+					transReq.onsuccess = (e) => res([local.StoryUUID, false])
 					transReq.onerror = (e) => rej(e)
 				}
 			})

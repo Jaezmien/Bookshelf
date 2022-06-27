@@ -1,10 +1,7 @@
 import { useFileStore } from '@/stores/files'
-import { BookNotificationType } from '@/types'
 import { onMounted } from 'vue'
 
-export const IDBLoaderComposition = (notification: BookNotificationType) => {
-	const fileStore = useFileStore()
-
+export const IDBLoaderComposition = () => {
 	onMounted(async () => {
 		try {
 			return await IDBLoaderAsync()

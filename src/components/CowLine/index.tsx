@@ -1,5 +1,4 @@
-import { h, defineComponent, PropType } from 'vue'
-import { BookshelfStoryConfig } from '@/types'
+import { defineComponent } from 'vue'
 import { FiMHTMLTree } from '@/libs/FiMParser'
 
 function copyObject(obj: any) {

@@ -11,7 +11,7 @@ import path from "path";
 
 const fileStore = useFileStore()
 const create_notification = inject(BookNotification, (m, t = 0) => { })
-IDBLoader(create_notification)
+IDBLoader()
 
 const fileInputRef = ref<HTMLInputElement>(document.createElement('input'))
 const storyAddRef = ref<HTMLDivElement>(document.createElement('div'))
@@ -19,15 +19,19 @@ const storyAddRef = ref<HTMLDivElement>(document.createElement('div'))
 function on_drop(files: DropLoaderResult[]) {
 	for (const [filename, storyFile] of files) {
 		load_file_as_text(storyFile).then(
-			event => {
-				const story = ParseFiMStory(filename, (event.target!.result) as string)
-				fileStore.add_file(filename, story)
+			async event => {
+				const story = await ParseFiMStory(filename, (event.target!.result) as string)
+				const [, isUpdate] = await fileStore.add_file(filename, story)
+				create_notification(`${isUpdate ? 'Updated' : 'Added'} story ${story.Format === FiMFormatType.RAW ? filename : story.Title}.`)
 			}
-		).catch(on_drop_error)
+		).catch((err) => {
+			console.error(err)
+			on_drop_error('An error has occured while trying to read the file.')
+		})
 	}
 }
 function on_drop_error(err: any) {
-	create_notification(err as string, 2)
+	create_notification(err ?? 'An error has occured while trying to load the file.', 2)
 }
 
 function delete_story(uuid: string) {
