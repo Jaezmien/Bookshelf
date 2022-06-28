@@ -108,7 +108,7 @@ onUnmounted(() => {
 
 	<nav ref="nav"
 		 :style="{ '--completion': tweenedStoryCompletion.value + '%' }"
-		 :class="{ 'sticky': navSticky, 'no-sticky': chapters!.length === 1 }">
+		 :class="{ 'sticky': navSticky }">
 		<FadeTransition>
 			<div v-show="isChapterInRange(currentChapter - 1)"
 				 id="chapter-prev"
