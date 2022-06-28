@@ -82,12 +82,14 @@ export const useFileStore = defineStore('files', {
 
 		async load_file(uuid: string) {
 			return new Promise<[LSData, IDBStory]>((res, rej) => {
+				const index = this.stories.findIndex((story) => story.StoryUUID === uuid)
+				if (index === -1) return rej(`The story uuid ${uuid} cannot be found.`)
+
 				const storyStore = this.db!.transaction(['stories'], 'readonly').objectStore('stories')
 				const req = storyStore.get(uuid)
 
 				req.onerror = (e) => rej(e)
 				req.onsuccess = (e) => {
-					const index = this.stories.findIndex((story) => story.StoryUUID === uuid)
 					this.stories[index].LastAccessed = Date.now()
 					localStorage.setItem('stories', JSON.stringify(this.stories)) // Update last accessed
 
