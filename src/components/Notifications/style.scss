@@ -17,8 +17,8 @@ $TEXT: #eeeeee;
 		padding: 1rem;
 		border-radius: 0.5rem;
 
-		background: $TEXT;
-		color: $BACKGROUND;
+		background: $TEXT !important;
+		color: $BACKGROUND !important;
 
 		max-width: 80vw;
 		width: fit-content;
