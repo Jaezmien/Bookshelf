@@ -15,23 +15,33 @@ IDBLoader()
 
 const fileInputRef = ref<HTMLInputElement>(document.createElement('input'))
 const storyAddRef = ref<HTMLDivElement>(document.createElement('div'))
+const loadingAmountRef = ref<number | null>(null)
 
-function on_drop(files: DropLoaderResult[]) {
-	for (const [filename, storyFile] of files) {
-		load_file_as_text(storyFile).then(
-			async event => {
-				const story = await ParseFiMStory(filename, (event.target!.result) as string)
-				const [, isUpdate] = await fileStore.add_file(filename, story)
-				create_notification(`${isUpdate ? 'Updated' : 'Added'} story ${story.Format === FiMFormatType.RAW ? filename : story.Title}.`)
-			}
-		).catch((err) => {
-			console.error(err)
-			on_drop_error('An error has occured while trying to read the file.')
-		})
+async function load_story(filename: string, storyFile: File) {
+	try {
+		const event = await load_file_as_text(storyFile)
+
+		const story = await ParseFiMStory(filename, (event.target!.result) as string)
+		const [, isUpdate] = await fileStore.add_file(filename, story)
+		create_notification(`${isUpdate ? 'Updated' : 'Added'} story ${story.Format === FiMFormatType.RAW ? filename : story.Title}.`)
+	}
+	catch (err) {
+		console.error(err)
+		on_drop_error(`An error has occured while trying to read the file ${filename}.`)
+	}
+	finally {
+		loadingAmountRef.value! -= 1
 	}
 }
+
+function on_drop(files: DropLoaderResult[]) {
+	loadingAmountRef.value = files.length
+	Promise.all(files.map(([f, sf]) => load_story(f, sf))).then(() => {
+		loadingAmountRef.value = null
+	})
+}
 function on_drop_error(err: any) {
-	create_notification(err ?? 'An error has occured while trying to load the file.', 2)
+	create_notification(err ?? 'An error has occured while trying to load a file.', 2)
 }
 
 function delete_story(uuid: string) {
@@ -99,9 +109,17 @@ const sortedSelection = computed(() => {
 			<div id="story-add"
 				 ref="storyAddRef"
 				 :class="{ dragging: isUserDragging }">
-				<FeatherIcon :icon="'download'"
-							 :size="'2rem'"></FeatherIcon>
-				<p><b>Upload a file</b>, or drag it here.</p>
+				<template v-if="!loadingAmountRef">
+					<FeatherIcon :icon="'download'"
+								 :size="'2rem'"></FeatherIcon>
+					<p><b>Upload a file</b>, or drag it here.</p>
+				</template>
+				<template v-else>
+					<FeatherIcon :icon="'refresh-cw'"
+								 :size="'2rem'"
+								 class="spinner"></FeatherIcon>
+					<p>Uploading {{ loadingAmountRef }} stories...</p>
+				</template>
 			</div>
 			<input type="file"
 				   ref="fileInputRef" />
@@ -198,6 +216,24 @@ $BACKGROUND: #1f2229;
 		p {
 			margin: 0 1rem;
 			text-align: center;
+		}
+
+		// Animation
+		.spinner {
+			animation-name: spin;
+			animation-timing-function: ease-in-out;
+			animation-iteration-count: infinite;
+			animation-duration: 2000ms;
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+
+			100% {
+				transform: rotate(720deg);
+			}
 		}
 	}
 }
