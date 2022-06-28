@@ -12,6 +12,7 @@ import PageTransition from '@/transitions/PageTransition.vue';
 import Navigation from './Navigation.vue';
 import { Bookmark, delete_bookmark, save_bookmark } from '@/libs/Bookmark';
 import { BookNotification } from '@/symbols';
+import debounce from "debounce";
 
 const props = defineProps({
 	filename: {
@@ -137,6 +138,7 @@ const navStickyPadding = ref<number>(0)
 
 // Bookmark
 const bookmarkPosition = ref<number | null>(null)
+const { completion: chapterProgress } = WatchStoryProgress(contentContainer)
 if (props.bookmark) {
 	if (props.bookmark.elementIndex > 0) {
 		watch(currentChapter, (val) => {
@@ -153,8 +155,6 @@ if (props.bookmark) {
 		}, { immediate: true })
 	}
 
-	const debounce = (await import('debounce')).default
-
 	WatchStoryLastChild(contentContainer, debounce((el, i) => {
 		if (!loadedBookmark.value) return
 		if (el === null && i === null && currentChapter.value === 0) {
@@ -165,7 +165,6 @@ if (props.bookmark) {
 		}
 	}, 1000))
 }
-const { completion: chapterProgress } = WatchStoryProgress(contentContainer)
 </script>
 
 <template>

@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { h, defineComponent } from 'vue'
 import { FiMHTMLTree } from '@/libs/FiMParser'
 
 function copyObject(obj: any) {
