@@ -249,7 +249,7 @@ $BACKGROUND: #1f2229;
 
 #story-list-container {
 	grid-area: list;
-	overflow-y: hidden;
+	overflow-y: auto;
 	max-height: 100%;
 
 	#story-container-empty {
