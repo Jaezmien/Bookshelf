@@ -140,7 +140,7 @@ $BACKGROUND: #1f2229;
 
 nav {
 	--completion: 0%;
-	$PROGRESS_DARK: darken($BACKGROUND, 5%);
+	$PROGRESS_DARK: darken($BACKGROUND, 8%);
 	$PROGRESS_LIGHT: lighten($BACKGROUND, 5%);
 
 	width: 100%;
