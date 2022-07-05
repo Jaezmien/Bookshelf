@@ -31,6 +31,8 @@ defineEmits(['book:click'])
 				</svg>
 
 				<h1 id="header">Bookshelf</h1>
+
+				<small>V1.1.0</small>
 			</div>
 		</div>
 	</div>
@@ -56,7 +58,7 @@ defineEmits(['book:click'])
 			margin: 0;
 			margin-left: 1rem;
 
-			@media screen and (max-width: 25rem) {
+			@media screen and (max-width: 30rem) {
 				font-size: 2rem;
 			}
 		}
@@ -65,10 +67,16 @@ defineEmits(['book:click'])
 			width: 4rem;
 			height: 4rem;
 
-			@media screen and (max-width: 25rem) {
+			@media screen and (max-width: 30rem) {
 				width: 3rem;
 				height: 3rem;
 			}
+		}
+
+		small {
+			margin-top: auto;
+			margin-left: 0.5rem;
+			opacity: 0.6;
 		}
 
 	}
