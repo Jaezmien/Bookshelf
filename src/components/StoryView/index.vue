@@ -36,6 +36,9 @@ const contentContainer = ref<HTMLElement>(document.createElement('div'))
 const navContainer = ref<typeof Navigation | null>()
 const create_notification = inject(BookNotification)!
 
+const loadedImages = ref(0);
+const detectedImages = ref(0);
+
 const showChapterModal = ref(false) // Modal
 const disableUserInput = ref(false) // So the UI doesn't mess up while its transitioning
 
@@ -65,6 +68,7 @@ const chapterInfo = computed((): BookshelfChapterInfo => {
 
 const setChapterIndex = (index: number, onChapterSwap?: () => void) => {
 	if (currentChapter.value === index) {
+		detectChapterImages(currentChapter.value);
 		onChapterSwap && onChapterSwap();
 		return;
 	}
@@ -85,6 +89,7 @@ const setChapterIndex = (index: number, onChapterSwap?: () => void) => {
 		currentChapter.value = index
 		if (resetPosition) navPosition.scrollIntoView()
 		showChapter.value = true
+		detectChapterImages(currentChapter.value);
 		onChapterSwap && onChapterSwap()
 	}, 250)
 	// Fade in
@@ -94,10 +99,45 @@ const setChapterIndex = (index: number, onChapterSwap?: () => void) => {
 	}, 250 + 250);
 }
 
+const detectChapterImages = (index: number) => {
+	loadedImages.value = 0;
+	if (props.story.Format !== FiMFormatType.FIMHTML) return;
+
+	const chapter = props.story.Chapters[Object.keys(props.story.Chapters)[index]]
+	let images = 0;
+	const buffer = [chapter];
+	while (buffer.length > 0) {
+		const node = buffer.shift();
+		if (!node) break;
+
+		for (const line of node) {
+			if (typeof line === "string") continue;
+
+			if (line.tag.toLowerCase() === "img") {
+				images++
+				continue;
+			}
+
+			if (line.children) buffer.push(line.children);
+		}
+	}
+
+	detectedImages.value = images;
+}
+const imageHasLoaded = (success: boolean) => {
+	loadedImages.value++
+}
+const allImagesHaveLoaded = computed(() => {
+	return props.story.Format === FiMFormatType.FIMHTML ? loadedImages.value === detectedImages.value : true
+})
+
+
 // Reset story here
 watch(() => props.story, () => {
 	currentChapter.value = 0
 	window.scrollTo({ top: 0, behavior: 'smooth' });
+	loadedImages.value = 0;
+	detectChapterImages(currentChapter.value);
 })
 
 const loadedBookmark = ref(false)
@@ -109,21 +149,22 @@ onMounted(async () => {
 		await (new Promise<void>((res, rej) => {
 			setChapterIndex(props.bookmark!.chapterIndex, res)
 		}));
-		if (props.bookmark.elementIndex > -1) {
-			await (new Promise<void>((res, rej) => {
-				nextTick(() => {
-					const el = contentContainer.value.children.item(props.bookmark!.elementIndex) as HTMLElement
-					console.log(el);
-					el.scrollIntoView()
+		await (new Promise<void>((res, rej) => {
+			if (props.bookmark && props.bookmark.elementIndex <= 0) return res();
 
-					setTimeout(() => res(), 2000)
-				})
-			}));
-		}
+			nextTick(() => {
+				const el = contentContainer.value.children.item(props.bookmark!.elementIndex) as HTMLElement
+				el.scrollIntoView()
+
+				setTimeout(() => res(), 2000)
+			})
+		}));
 		disableUserInput.value = false
 		loadedBookmark.value = true
 	}
 	else {
+		detectChapterImages(currentChapter.value);
+
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 		setTimeout(() => {
 			loadedBookmark.value = true
@@ -157,6 +198,8 @@ if (props.bookmark) {
 
 	WatchStoryLastChild(contentContainer, debounce((el, i) => {
 		if (!loadedBookmark.value) return
+		if (!allImagesHaveLoaded.value) return;
+
 		if (el === null && i === null && currentChapter.value === 0) {
 			delete_bookmark(props.bookmark!.uuid)
 		}
@@ -196,7 +239,8 @@ if (props.bookmark) {
 					 v-show="showChapter">
 				<cow-line v-for="text of chapterInfo.Text"
 						  :content="text"
-						  :config="undefined"></cow-line>
+						  :config="undefined"
+						  @image_loaded="imageHasLoaded"></cow-line>
 				<div id="story-bookmark"
 					 v-if="bookmarkPosition !== null"
 					 :style="{ '--position': bookmarkPosition + 'px' }"></div>
@@ -274,9 +318,4 @@ if (props.bookmark) {
 		}
 	}
 }
-
-// section {
-// margin: 0 2rem;
-// height: auto;
-// }
 </style>
