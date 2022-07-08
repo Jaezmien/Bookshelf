@@ -179,6 +179,7 @@ const navStickyPadding = ref<number>(0)
 
 // Bookmark
 const bookmarkPosition = ref<number | null>(null)
+const bookmarkIndicator = ref<HTMLDivElement>(document.createElement("div"))
 const { completion: chapterProgress } = WatchStoryProgress(contentContainer)
 if (props.bookmark) {
 	if (props.bookmark.elementIndex > 0) {
@@ -206,6 +207,11 @@ if (props.bookmark) {
 		else {
 			save_bookmark(props.bookmark!.uuid, currentChapter.value, i ?? -1)
 		}
+
+		bookmarkIndicator.value.classList.remove('active')
+		setTimeout(() => {
+			bookmarkIndicator.value.classList.add('active')
+		}, 1);
 	}, 1000))
 }
 </script>
@@ -261,6 +267,9 @@ if (props.bookmark) {
 			</p>
 		</div>
 	</Modal>
+
+	<div id="bookmark-indicator"
+		 ref="bookmarkIndicator"></div>
 </template>
 
 <style lang="scss" scoped>
@@ -316,6 +325,35 @@ if (props.bookmark) {
 		&.current {
 			background: transparentize(white, 0.9);
 		}
+	}
+}
+
+#bookmark-indicator {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 1rem;
+	height: 1rem;
+	border-top: 1rem solid green;
+	border-left: 1rem solid transparent;
+
+	&.active {
+		animation-name: pop;
+		animation-duration: 500ms;
+		animation-timing-function: ease-out;
+		animation-fill-mode: forwards;
+	}
+
+	opacity: 0%;
+}
+
+@keyframes pop {
+	0% {
+		opacity: 100%;
+	}
+
+	100% {
+		opacity: 0%;
 	}
 }
 </style>
