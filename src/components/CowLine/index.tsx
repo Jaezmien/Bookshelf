@@ -6,9 +6,9 @@ function copyObject(obj: any) {
 }
 
 // eugh
-function recursiveRender(content: string | object) {
+function recursiveRender(content: string | object, cowline: InstanceType<typeof CowLine>) {
 	if( typeof content === 'string' ) {
-		return <p class='cow-line'>{ CowLine.methods!.sanitize_string(content) }</p>
+		return <p class='cow-line'>{ cowline.sanitize_string(content) }</p>
 		// if( !this.config || !this.configTextRegex?.test(this.content) ) {
 			// return <p>{ this.sanitize_string(this.content) }</p>
 		// }
@@ -21,14 +21,14 @@ function recursiveRender(content: string | object) {
 		const htmlContent = content as FiMHTMLTree
 		const ContentTag = htmlContent.tag
 
-		const attrs = CowLine.methods!.sanitize_attr(htmlContent.attr)
+		const attrs = cowline.sanitize_attr(htmlContent.attr)
 
 		if( htmlContent.children ) {
 			return (<ContentTag {...attrs}>
 				{
 					htmlContent.children!.map((child):any => {
-						if (typeof child === 'string') return CowLine.methods!.sanitize_string(child)
-						return recursiveRender(child)
+						if (typeof child === 'string') return cowline.sanitize_string(child)
+						return recursiveRender(child, cowline)
 					})
 				}
 			</ContentTag>)
@@ -57,6 +57,8 @@ const CowLine = defineComponent({
 		// }
 	},
 
+	emits: ['image_loaded'],
+
 	methods: {
 		sanitize_string(str: string) {
 			return (str || '').replace(/\.\.\.(?=\S)/g, '...\u200B')
@@ -65,7 +67,15 @@ const CowLine = defineComponent({
 			if (!_attr || !Object.keys(_attr).length) return { class: 'cow-line' }
 
 			const attr = copyObject(_attr)
-			if(attr.src) attr.src = this.fetch_image(attr.src)
+			if(attr.src) {
+				attr.onerror = (e: Event) => {
+					this.$emit('image_loaded', false)
+				}
+				attr.onload = (e: Event) => {
+					this.$emit('image_loaded', true)
+				}
+				attr.src = this.fetch_image(attr.src)
+			}
 			if(attr.class) {
 				if(Array.isArray(attr.class)) attr.class.push('cow-line')
 				else attr.class = (attr.class + ' cow-line').trim()
@@ -82,17 +92,16 @@ const CowLine = defineComponent({
 
 		// Modify if needed.
 		fetch_image(src: string) {
-			// if (this.story.blobImages && this.story.blobImages[src]) return this.story.blobImages[src]
+			let url = src;
 			if(src.startsWith('https://camo.fimfiction.net/')) {
-				const url = new URL(src)
-				return url.searchParams.get("url")
+				url = (new URL(src)).searchParams.get("url") || url
 			}
-			return src
+			return url;
 		},
 	},
 	
 	render() {
-		return recursiveRender(this.content);
+		return recursiveRender(this.content, this);
 	}
 })
 
