@@ -281,6 +281,7 @@ if (props.bookmark) {
 #story-container {
 	z-index: 0;
 	position: absolute;
+	overflow-x: hidden;
 }
 
 #story-content {
