@@ -166,9 +166,9 @@ nav {
 				min-height: 1rem;
 				margin: 0;
 				text-align: center;
-				cursor: pointer;
 			}
 
+			cursor: pointer;
 			user-select: none;
 		}
 
