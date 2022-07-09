@@ -32,7 +32,7 @@ defineEmits(['book:click'])
 
 				<h1 id="header">Bookshelf</h1>
 
-				<small>V1.1.1</small>
+				<small>V1.1.2</small>
 			</div>
 		</div>
 	</div>
