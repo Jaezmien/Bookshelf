@@ -314,6 +314,8 @@ if (props.bookmark) {
 	max-height: 80vh;
 	overflow-y: auto;
 
+	user-select: none;
+
 	p {
 		text-align: center;
 		margin: 0;
