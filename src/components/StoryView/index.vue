@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { WatchStoryLastChild, WatchStoryProgress } from '@/composables/scrollwatcher';
+import { WatchStoryLastChild, WatchChapterProgress } from '@/composables/scrollwatcher';
 import { FiMFormatType, FiMStoryType, FiMStoryFull } from '@/libs/FiMParser';
 import { ref, computed, PropType, onMounted, watch, inject, onUnmounted, nextTick } from 'vue';
 import { BookshelfChapterInfo } from '@/types';
@@ -13,6 +13,7 @@ import Navigation from './Navigation.vue';
 import { Bookmark, delete_bookmark, save_bookmark } from '@/libs/Bookmark';
 import { BookNotification } from '@/symbols';
 import debounce from "debounce";
+import { WatchStoryProgress } from '@/composables/storyprogress';
 
 const props = defineProps({
 	filename: {
@@ -131,7 +132,6 @@ const allImagesHaveLoaded = computed(() => {
 	return props.story.Format === FiMFormatType.FIMHTML ? loadedImages.value === detectedImages.value : true
 })
 
-
 // Reset story here
 watch(() => props.story, () => {
 	currentChapter.value = 0
@@ -180,7 +180,11 @@ const navStickyPadding = ref<number>(0)
 // Bookmark
 const bookmarkPosition = ref<number | null>(null)
 const bookmarkIndicator = ref<HTMLDivElement>(document.createElement("div"))
-const { completion: chapterProgress } = WatchStoryProgress(contentContainer)
+const { completion: chapterProgress } = WatchChapterProgress(contentContainer)
+const storyProgress = WatchStoryProgress(chapters!, currentChapter, chapterProgress, isTransitioning)
+watch(storyProgress, (v) => {
+	console.log(v)
+})
 if (props.bookmark) {
 	if (props.bookmark.elementIndex > 0) {
 		watch(currentChapter, (val) => {
@@ -205,13 +209,15 @@ if (props.bookmark) {
 			delete_bookmark(props.bookmark!.uuid)
 		}
 		else {
-			save_bookmark(props.bookmark!.uuid, currentChapter.value, i ?? -1)
+			save_bookmark(props.bookmark!.uuid, storyProgress.value, currentChapter.value, i ?? -1)
 		}
 
-		bookmarkIndicator.value.classList.remove('active')
-		setTimeout(() => {
-			bookmarkIndicator.value.classList.add('active')
-		}, 1);
+		if (bookmarkIndicator.value) {
+			bookmarkIndicator.value.classList.remove('active')
+			setTimeout(() => {
+				bookmarkIndicator.value.classList.add('active')
+			}, 1);
+		}
 	}, 1000))
 }
 </script>
@@ -229,8 +235,7 @@ if (props.bookmark) {
 					:currentChapter="currentChapter"
 					:chapter-info="chapterInfo"
 					:show-chapter="showChapter"
-					:chapter-progress="chapterProgress"
-					:is-transitioning="isTransitioning"
+					:story-progress="storyProgress"
 					@set-chapter-index="(i) => {
 						if (disableUserInput) return;
 						setChapterIndex(i);

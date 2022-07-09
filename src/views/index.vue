@@ -8,10 +8,20 @@ import { FiMFormatType, ParseFiMStory } from '@/libs/FiMParser';
 import FeatherIcon from '@/components/FeatherIcon.vue';
 import { CreateButtonLoader, CreateDropLoader, DropLoaderResult, load_file_as_text } from '@/composables/droploader';
 import path from "path";
+import { Bookmark, load_bookmark } from '@/libs/Bookmark';
 
 const fileStore = useFileStore()
 const create_notification = inject(BookNotification, (m, t = 0) => { })
 IDBLoader()
+
+const bookmarkStatus = computed(() => {
+	if (!fileStore.stories) return null
+
+	return fileStore.stories.map(story => story.StoryUUID).reduce<Record<string, number>>((tbl, uuid) => {
+		tbl[uuid] = load_bookmark(uuid).progress ?? 0
+		return tbl
+	}, {})
+})
 
 const fileInputRef = ref<HTMLInputElement>(document.createElement('input'))
 const storyAddRef = ref<HTMLDivElement>(document.createElement('div'))
@@ -143,6 +153,7 @@ const sortedSelection = computed(() => {
 						 custom
 						 v-slot="{ navigate }">
 				<div class="story"
+					 :style="{ '--completion': (bookmarkStatus ? bookmarkStatus[story.StoryUUID] : 0) + '%' }"
 					 @click="navigate">
 					<span class="story-delete"
 						  @click.stop="delete_story(story.StoryUUID)">
@@ -266,21 +277,24 @@ $BACKGROUND: #1f2229;
 	}
 
 	.story {
+		--completion: 0%;
+		--progress-light: #{transparent};
+		--progress-dark: #{lighten($BACKGROUND, 5%)};
+
 		padding: 1rem 2rem;
 		background-color: transparent;
 		transition: background 200ms ease;
-		// border-radius: 0.5rem;
 
 		cursor: pointer;
 
 		&:hover {
-			background-color: transparentize(black, 0.9);
+			--progress-light: #{transparentize(black, 0.9)};
+			--progress-dark: #{lighten($BACKGROUND, 2%)};
 		}
 
-		.story-title {
-			margin: 0;
-		}
+		background: linear-gradient(90deg, var(--progress-dark) var(--completion), var(--progress-light) var(--completion));
 
+		.story-title,
 		.story-author {
 			margin: 0;
 		}
