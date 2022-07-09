@@ -290,6 +290,11 @@ if (props.bookmark) {
 
 	position: relative;
 
+	> :not(#story-bookmark) {
+		margin-left: 1.5rem;
+		margin-right: 1.5rem;
+	}
+
 	#story-bookmark {
 		--position: 0px;
 
