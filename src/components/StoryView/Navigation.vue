@@ -92,10 +92,15 @@ onUnmounted(() => {
 		</FadeTransition>
 
 		<FadeTransition>
-			<div id="chapter-name"
-				 v-show="showChapter"
-				 @dblclick="$emit('showChapterModal')">
-				<h3>{{ navSticky ? '&nbsp;' : chapterInfo.Name }}</h3>
+			<div id="chapter-info"
+				 v-show="showChapter">
+				<div id="chapter-name"
+					 @dblclick="$emit('showChapterModal')">
+					<h3>{{ navSticky ? '&nbsp;' : chapterInfo.Name }}</h3>
+				</div>
+				<p id="chapter-index">
+					{{ currentChapter }}
+				</p>
 			</div>
 		</FadeTransition>
 
@@ -123,7 +128,7 @@ nav {
 	background: linear-gradient(90deg, $PROGRESS_LIGHT var(--completion), $PROGRESS_DARK var(--completion));
 
 	display: grid;
-	grid-template-areas: "previous name next";
+	grid-template-areas: "previous info next";
 	grid-template-rows: auto;
 	grid-template-columns: 1fr 6fr 1fr;
 	place-items: center;
@@ -143,22 +148,44 @@ nav {
 		grid-area: previous;
 	}
 
-	#chapter-name {
-		grid-area: name;
+	#chapter-info {
+		grid-area: info;
 		width: 100%;
 		height: 100%;
 
 		display: grid;
 		place-items: center;
 
-		padding: 1rem 1rem;
+		position: relative;
+		overflow: hidden;
 
-		>* {
-			min-height: 1rem;
+		#chapter-name {
+			padding: 1rem 1rem;
+
+			>* {
+				min-height: 1rem;
+				margin: 0;
+				text-align: center;
+				user-select: none;
+				cursor: pointer;
+			}
+		}
+
+		#chapter-index {
+			font-family: 'Kanit', sans-serif;
+
 			margin: 0;
-			text-align: center;
-			user-select: none;
-			cursor: pointer;
+			position: absolute;
+			left: 50%;
+			bottom: 50%;
+			transform: translateX(-50%) translateY(55%);
+			font-size: 10rem;
+			font-weight: 900;
+			mix-blend-mode: lighten;
+
+			-webkit-text-fill-color: #{transparent};
+			-webkit-text-stroke-width: 0.2rem;
+			-webkit-text-stroke-color: #{transparentize(white, 0.95)};
 		}
 	}
 
