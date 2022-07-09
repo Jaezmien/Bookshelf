@@ -166,9 +166,10 @@ nav {
 				min-height: 1rem;
 				margin: 0;
 				text-align: center;
-				user-select: none;
 				cursor: pointer;
 			}
+
+			user-select: none;
 		}
 
 		#chapter-index {
@@ -186,6 +187,8 @@ nav {
 			-webkit-text-fill-color: #{transparent};
 			-webkit-text-stroke-width: 0.2rem;
 			-webkit-text-stroke-color: #{transparentize(white, 0.95)};
+
+			user-select: none;
 		}
 	}
 
@@ -208,6 +211,8 @@ nav {
 		&:hover {
 			background: transparentize(white, 0.9);
 		}
+
+		user-select: none;
 	}
 }
 </style>
