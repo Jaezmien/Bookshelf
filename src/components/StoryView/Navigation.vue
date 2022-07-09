@@ -96,7 +96,7 @@ onUnmounted(() => {
 				 v-show="showChapter">
 				<div id="chapter-name"
 					 @dblclick="$emit('showChapterModal')">
-					<h3>{{ navSticky ? '&nbsp;' : chapterInfo.Name }}</h3>
+					<h3 v-html="navSticky ? '&nbsp;' : chapterInfo.Name"></h3>
 				</div>
 				<p id="chapter-index">
 					{{ currentChapter }}
