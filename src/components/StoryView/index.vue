@@ -182,9 +182,6 @@ const bookmarkPosition = ref<number | null>(null)
 const bookmarkIndicator = ref<HTMLDivElement>(document.createElement("div"))
 const { completion: chapterProgress } = WatchChapterProgress(contentContainer)
 const storyProgress = WatchStoryProgress(chapters!, currentChapter, chapterProgress, isTransitioning)
-watch(storyProgress, (v) => {
-	console.log(v)
-})
 if (props.bookmark) {
 	if (props.bookmark.elementIndex > 0) {
 		watch(currentChapter, (val) => {
