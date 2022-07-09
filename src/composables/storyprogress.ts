@@ -34,6 +34,7 @@ export const WatchStoryProgress = (
 			if (transitioning.value) {
 				tweenedStoryCompletion.value = v
 			} else {
+				gsapTemp.value = tweenedStoryCompletion.value
 				gsap.to(gsapTemp, { duration: 0.25, value: v })
 			}
 		}
