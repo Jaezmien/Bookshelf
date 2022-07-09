@@ -32,14 +32,10 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
-	chapterProgress: {
+	storyProgress: {
 		type: Number,
 		default: 0,
-	},
-	isTransitioning: {
-		type: Boolean,
-		default: false
-	},
+	}
 })
 const emits = defineEmits(['setChapterIndex', 'showChapterModal', 'setSticky'])
 
@@ -54,28 +50,6 @@ defineExpose({
 const isChapterInRange = (index: number) => {
 	return index > -1 && index < props.chapters.length
 }
-
-// Fancy CSS
-const storyCompletion = computed(() => {
-	return (props.currentChapter / props.chapters.length) * 100
-});
-const individualChapterCount = computed(() => {
-	return (1 / props.chapters.length) * 100
-})
-const overallStoryCompletion = computed(() => {
-	return storyCompletion.value + ((props.chapterProgress / 100) * individualChapterCount.value)
-})
-const tweenedStoryCompletion = reactive({
-	value: 0,
-})
-watch(() => overallStoryCompletion.value, (v) => {
-	if (props.isTransitioning) {
-		tweenedStoryCompletion.value = v
-	}
-	else {
-		gsap.to(tweenedStoryCompletion, { duration: 0.5, value: v })
-	}
-})
 
 // Scrolling
 const navSticky = ref(false)
@@ -107,7 +81,7 @@ onUnmounted(() => {
 		 v-if="navSticky"></div>
 
 	<nav ref="nav"
-		 :style="{ '--completion': tweenedStoryCompletion.value + '%' }"
+		 :style="{ '--completion': storyProgress + '%' }"
 		 :class="{ 'sticky': navSticky }">
 		<FadeTransition>
 			<div v-show="isChapterInRange(currentChapter - 1)"

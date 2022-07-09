@@ -29,7 +29,7 @@ export const WatchStoryLastChild = (
 	})
 }
 
-export const WatchStoryProgress = (container: Ref<HTMLElement>) => {
+export const WatchChapterProgress = (container: Ref<HTMLElement>) => {
 	const completion = ref(0)
 
 	function on_scroll(event: Event) {
