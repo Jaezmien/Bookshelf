@@ -264,8 +264,8 @@ if (props.bookmark) {
 			   @click="() => {
 			   	if (currentChapter !== index) setChapterIndex(index)
 			   	showChapterModal = false
-			   }">
-				{{ name }}
+			   }"
+			   v-html="name">
 			</p>
 		</div>
 	</Modal>
