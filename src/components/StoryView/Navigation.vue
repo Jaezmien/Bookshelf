@@ -189,6 +189,7 @@ nav {
 			-webkit-text-stroke-color: #{transparentize(white, 0.95)};
 
 			user-select: none;
+			pointer-events: none;
 		}
 	}
 
