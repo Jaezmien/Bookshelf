@@ -99,7 +99,7 @@ onUnmounted(() => {
 					<h3 v-html="navSticky ? '&nbsp;' : chapterInfo.Name"></h3>
 				</div>
 				<p id="chapter-index">
-					{{ currentChapter }}
+					{{ currentChapter + 1 }}
 				</p>
 			</div>
 		</FadeTransition>
