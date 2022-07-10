@@ -93,9 +93,9 @@ onUnmounted(() => {
 
 		<FadeTransition>
 			<div id="chapter-info"
-				 v-show="showChapter">
-				<div id="chapter-name"
-					 @dblclick="$emit('showChapterModal')">
+				 v-show="showChapter"
+				 @dblclick="$emit('showChapterModal')">
+				<div id="chapter-name">
 					<h3 v-html="navSticky ? '&nbsp;' : chapterInfo.Name"></h3>
 				</div>
 				<p id="chapter-index">
@@ -167,10 +167,10 @@ nav {
 				margin: 0;
 				text-align: center;
 			}
-
-			cursor: pointer;
-			user-select: none;
 		}
+
+		cursor: pointer;
+		user-select: none;
 
 		#chapter-index {
 			font-family: 'Kanit', sans-serif;
@@ -187,9 +187,6 @@ nav {
 			-webkit-text-fill-color: #{transparent};
 			-webkit-text-stroke-width: 0.2rem;
 			-webkit-text-stroke-color: #{transparentize(white, 0.95)};
-
-			user-select: none;
-			pointer-events: none;
 		}
 	}
 
