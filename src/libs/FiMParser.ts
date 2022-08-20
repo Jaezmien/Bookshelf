@@ -148,7 +148,7 @@ export async function ParseFiMStory(file: string, content: string): Promise<FiMS
 	}
 
 	// -- Check if we need to parse HTML -- \\
-	if (file.endsWith('.html')) {
+	if (file.endsWith('.html') || file.endsWith('.htm')) {
 		Story.Format = FiMFormatType.FIMHTML
 		return ParseFiMHTMLStory(content, Story)
 	}
