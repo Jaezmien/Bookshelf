@@ -252,7 +252,7 @@ $BACKGROUND: #1f2229;
 
 	#story-bookshelf-config {
 		display: grid;
-		grid-template-columns: 4fr 1fr;
+		grid-template-columns: 4fr 10rem;
 
 		>* {
 			cursor: pointer;
