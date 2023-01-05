@@ -183,7 +183,7 @@ $BACKGROUND: #1f2229;
 	grid-template-areas:
 		'logo'
 		'content';
-	grid-template-rows: 1fr 4fr;
+	grid-template-rows: 1fr 5fr;
 
 	#bookshelf-logo {
 		grid-area: logo;
