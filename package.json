@@ -10,6 +10,9 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@fontsource/kanit": "^4.5.10",
+		"@fontsource/open-sans": "^4.5.13",
+		"@fontsource/roboto-slab": "^4.5.9",
 		"buffer": "^6.0.3",
 		"debounce": "^1.2.1",
 		"fimfic-parser": "https://github.com/Jaezmien/fimfic-parser",

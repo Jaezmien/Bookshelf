@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FadeTransition from '@/transitions/FadeTransition.vue';
 import { BookshelfChapterInfo } from '@/types';
+import '@fontsource/kanit/900.css';
 import { FIMStory } from 'fimfic-parser';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, PropType, ref } from 'vue';

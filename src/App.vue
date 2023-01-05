@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import DragDrop from '@/views/drag.vue';
+import "@fontsource/open-sans/300-italic.css";
+import "@fontsource/open-sans/300.css";
+import "@fontsource/open-sans/400-italic.css";
+import "@fontsource/open-sans/400.css";
+import "@fontsource/open-sans/600-italic.css";
+import "@fontsource/open-sans/600.css";
 import { RouterView } from 'vue-router';
 import { useDatabaseStore } from './stores/database';
 import FadeTransition from './transitions/FadeTransition.vue';

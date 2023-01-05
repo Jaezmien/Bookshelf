@@ -177,6 +177,7 @@ $BACKGROUND: #1f2229;
 #index-container {
 	height: 100vh;
 	overflow-x: hidden;
+
 	display: grid;
 
 	grid-template-areas:
@@ -195,10 +196,17 @@ $BACKGROUND: #1f2229;
 	display: flex;
 	flex-direction: column;
 
+	min-height: 0;
+
 	#story-bookshelf-stories {
 		flex-grow: 1;
 
 		background-color: lighten($BACKGROUND, 10%);
+		display: flex;
+		flex-direction: column;
+
+		height: 100%;
+		overflow-y: auto;
 
 		.story {
 			--completion: 0%;
@@ -309,121 +317,6 @@ $BACKGROUND: #1f2229;
 
 		}
 	}
-}
-
-#story-add-container {
-	grid-area: insert;
-
-	display: grid;
-	place-items: center;
-
-	#story-add {
-		height: 6rem;
-		width: 100%;
-		display: block;
-		border-radius: 1rem;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-
-		border: dashed 2px transparentize(white, 0.8);
-		transition: border 200ms ease;
-
-		&.dragging {
-			border: dashed 2px white;
-		}
-
-		cursor: pointer;
-
-		p {
-			margin: 0 1rem;
-			text-align: center;
-		}
-
-		// Animation
-		.spinner {
-			animation-name: spin;
-			animation-timing-function: ease-in-out;
-			animation-iteration-count: infinite;
-			animation-duration: 2000ms;
-		}
-
-		@keyframes spin {
-			0% {
-				transform: rotate(0deg);
-			}
-
-			100% {
-				transform: rotate(720deg);
-			}
-		}
-	}
-}
-
-#story-list-options {
-	grid-area: options;
-
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-}
-
-#story-list-container {
-	grid-area: list;
-	overflow-y: auto;
-	overflow-x: hidden;
-	max-height: 100%;
-
-	#story-container-empty {
-		text-align: center;
-		opacity: 50%;
-	}
-
-	background-color: lighten($BACKGROUND, 10%);
-	border-radius: 0.5rem;
-
-	.os-host {
-		max-height: inherit;
-	}
-
-	.story {
-		--completion: 0%;
-		--progress-light: #{transparent};
-		--progress-dark: #{lighten($BACKGROUND, 5%)};
-
-		padding: 1rem 2rem;
-		background-color: transparent;
-		transition: background 200ms ease;
-
-		cursor: pointer;
-
-		&:hover {
-			--progress-light: #{transparentize(black, 0.9)};
-			--progress-dark: #{lighten($BACKGROUND, 2%)};
-		}
-
-		background: linear-gradient(90deg, var(--progress-dark) var(--completion), var(--progress-light) var(--completion));
-
-		.story-title,
-		.story-author {
-			margin: 0;
-		}
-
-		.story-delete {
-			float: right;
-			cursor: pointer;
-			color: lighten(red, 20%);
-			margin-left: 1rem;
-			transition: color 200ms ease;
-
-			&:hover {
-				color: lighten(red, 0%);
-			}
-		}
-	}
-
 }
 
 input[type=file] {
