@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import Bookshelf from '@/components/Bookshelf.vue';
-import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useFileStore } from '@/stores/files'
-import { BookNotification } from '@/symbols'
-import { CreateDropLoader, CreateButtonLoader, FileReaderResult, DropLoaderResult, load_file_as_text } from '@/composables/droploader';
-import { FiMFormatType, FiMStoryRaw, FiMStoryType, ParseFiMStory } from '@/libs/FiMParser';
 import DragStoryView from '@/components/DragStoryView.vue';
-
-const fileStore = useFileStore()
-const indexedDB = ref<Boolean>(fileStore.browser_supports_indexeddb)
+import { CreateButtonLoader, CreateDropLoader, DropLoaderResult, load_file_as_text } from '@/composables/droploader';
+import { BookNotification } from '@/symbols';
+import ParseFIMStory, { FIMStory } from "fimfic-parser";
+import { inject, ref } from 'vue';
 
 const fileInputRef = ref<HTMLInputElement>(document.createElement('input'))
 const buttonRef = ref<HTMLButtonElement>(document.createElement('button'))
 const containerRef = ref<HTMLDivElement>(document.createElement('div'))
 
 const isInMenu = ref<Boolean>(true)
-const story = ref<FiMStoryType>()
+const story = ref<FIMStory>()
 const storyFilename = ref<string>()
 const create_notification = inject(BookNotification, (m, t = 0) => { })
 
@@ -26,7 +22,7 @@ function load_story(files: DropLoaderResult[]) {
 
 	load_file_as_text(storyFile).then(
 		async event => {
-			story.value = await ParseFiMStory(filename, (event.target!.result) as string)
+			story.value = await ParseFIMStory((event.target!.result) as string)
 			storyFilename.value = filename
 			isInMenu.value = false
 		}
@@ -50,8 +46,6 @@ CreateButtonLoader(buttonRef, fileInputRef, load_story, error_load_story)
 		<!-- Home -->
 		<section v-if="isInMenu">
 			<Bookshelf></Bookshelf>
-			<p v-if="!indexedDB"
-			   id="feature-warning">IndexedDB Feature Not Found!</p>
 			<div id="story-import">
 				<button ref="buttonRef">Load a story</button>
 				<p>&nbsp;or drag it into this window!</p>
@@ -88,15 +82,9 @@ CreateButtonLoader(buttonRef, fileInputRef, load_story, error_load_story)
 	margin: 0 1rem;
 }
 
-#feature-warning {
-	margin-top: 0rem;
-	margin-bottom: 1rem;
-	color: hsla(0, 100%, 50%, 0.50);
-	font-style: italic;
-	font-size: 0.9rem;
-}
-
 #story-import {
+	margin-top: 1rem;
+
 	* {
 		display: inline-block;
 		margin: 0;

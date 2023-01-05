@@ -2,11 +2,10 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import IndexRoute from '@/views/index.vue'
 import StoryRoute from '@/views/story.vue'
-import { nextTick } from 'process'
 
 const routes: RouteRecordRaw[] = [
 	{
-		path: '/story/:uuid([a-z0-9]+)',
+		path: '/story/:id([A-Za-z0-9_-]+)',
 		name: 'Story',
 		component: StoryRoute,
 	},

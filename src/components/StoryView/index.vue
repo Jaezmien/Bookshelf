@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { WatchStoryLastChild, WatchChapterProgress } from '@/composables/scrollwatcher';
-import { FiMFormatType, FiMStoryType, FiMStoryFull } from '@/libs/FiMParser';
-import { ref, computed, PropType, onMounted, watch, inject, onUnmounted, nextTick } from 'vue';
-import { BookshelfChapterInfo } from '@/types';
-import path from 'path';
-import '@/components/CowLine/style.scss'
-import CowLine from '@/components/CowLine'
+import CowLine from '@/components/CowLine';
+import '@/components/CowLine/style.scss';
 import Modal from '@/components/Modal.vue';
-import Info from './Info.vue';
-import PageTransition from '@/transitions/PageTransition.vue';
-import Navigation from './Navigation.vue';
-import { Bookmark, delete_bookmark, save_bookmark } from '@/libs/Bookmark';
-import { BookNotification } from '@/symbols';
-import debounce from "debounce";
+import { WatchChapterProgress, WatchStoryLastChild } from '@/composables/scrollwatcher';
 import { WatchStoryProgress } from '@/composables/storyprogress';
+import { Bookmark, delete_bookmark, save_bookmark } from '@/libs/Bookmark';
+import { useFileStore } from '@/stores/files';
+import { BookNotification } from '@/symbols';
+import PageTransition from '@/transitions/PageTransition.vue';
+import { BookshelfChapterInfo } from '@/types';
+import debounce from "debounce";
+import { FIMStory } from 'fimfic-parser';
+import path from 'path';
+import { computed, inject, nextTick, onMounted, onUnmounted, PropType, provide, ref, watch } from 'vue';
+import Info from './Info.vue';
+import Navigation from './Navigation.vue';
 
 const props = defineProps({
 	filename: {
@@ -22,7 +23,7 @@ const props = defineProps({
 		default: () => '',
 	},
 	story: {
-		type: Object as PropType<FiMStoryType>,
+		type: Object as PropType<FIMStory>,
 		required: true
 	},
 	bookmark: {
@@ -32,6 +33,7 @@ const props = defineProps({
 })
 // const emits = defineEmits(['setBookmark'])
 
+const fileStore = useFileStore()
 const currentChapter = ref(0)
 const contentContainer = ref<HTMLElement>(document.createElement('div'))
 const navContainer = ref<typeof Navigation | null>()
@@ -49,21 +51,20 @@ const showChapter = ref(true)
 const isTransitioning = ref(false)
 
 const chapters = computed(() => {
-	if (props.story.Format === FiMFormatType.RAW) return undefined
-	return Object.keys(props.story.Chapters)
+	if (props.story.Format === 'NONE') return undefined
+	return props.story.Content.map(c => c.Title)
 })
 const chapterInfo = computed((): BookshelfChapterInfo => {
-	if (props.story.Format === FiMFormatType.RAW) {
+	if (props.story.Format === 'NONE') {
 		return {
 			Name: undefined,
-			Text: props.story.Text
+			Text: props.story.Content
 		}
 	}
 
-	const chapterName = chapters.value![currentChapter.value]
 	return {
-		Name: chapterName,
-		Text: props.story.Chapters[chapterName]
+		Name: props.story.Content[currentChapter.value].Title,
+		Text: props.story.Content[currentChapter.value].Contents
 	}
 })
 
@@ -100,37 +101,17 @@ const setChapterIndex = (index: number, onChapterSwap?: () => void) => {
 	}, 250 + 250);
 }
 
+// Required to load images immediately due to bookmark positioning
 const detectChapterImages = (index: number) => {
 	loadedImages.value = 0;
-	if (props.story.Format !== FiMFormatType.FIMHTML) return;
+	if (props.story.Format !== 'HTML') return;
 
-	const chapter = props.story.Chapters[Object.keys(props.story.Chapters)[index]]
-	let images = 0;
-	const buffer = [chapter];
-	while (buffer.length > 0) {
-		const node = buffer.shift();
-		if (!node) break;
-
-		for (const line of node) {
-			if (typeof line === "string") continue;
-
-			if (line.tag.toLowerCase() === "img") {
-				images++
-				continue;
-			}
-
-			if (line.children) buffer.push(line.children);
-		}
-	}
-
-	detectedImages.value = images;
-}
-const imageHasLoaded = (success: boolean) => {
-	loadedImages.value++
+	detectedImages.value = fileStore.get_html_images(props.story.Content[index]).length;
 }
 const allImagesHaveLoaded = computed(() => {
-	return props.story.Format === FiMFormatType.FIMHTML ? loadedImages.value === detectedImages.value : true
+	return props.story.Format === 'HTML' ? loadedImages.value === detectedImages.value : true
 })
+provide('imageHasLoaded', () => { loadedImages.value++ })
 
 // Reset story here
 watch(() => props.story, () => {
@@ -142,7 +123,7 @@ watch(() => props.story, () => {
 
 const loadedBookmark = ref(false)
 onMounted(async () => {
-	document.title = `${props.story.Format === FiMFormatType.RAW ? (path.basename(props.filename, path.extname(props.filename))) : props.story.Title} - Bookshelf`
+	document.title = `${props.story.Format === 'NONE' ? (path.basename(props.filename, path.extname(props.filename))) : props.story.Title} - Bookshelf`
 
 	if (props.bookmark) {
 		disableUserInput.value = true
@@ -225,7 +206,7 @@ if (props.bookmark) {
 			  :filename="filename"></Info>
 
 		<Navigation ref="navContainer"
-					v-if="story.Format !== FiMFormatType.RAW"
+					v-if="story.Format !== 'NONE'"
 					:filename="filename"
 					:story="story"
 					:chapters="chapters!"
@@ -247,8 +228,7 @@ if (props.bookmark) {
 					 v-show="showChapter">
 				<cow-line v-for="text of chapterInfo.Text"
 						  :content="text"
-						  :config="undefined"
-						  @image_loaded="imageHasLoaded"></cow-line>
+						  :config="undefined"></cow-line>
 				<div id="story-bookmark"
 					 v-if="bookmarkPosition !== null"
 					 :style="{ '--position': bookmarkPosition + 'px' }"></div>
@@ -259,7 +239,7 @@ if (props.bookmark) {
 	<Modal :active="showChapterModal"
 		   @close="showChapterModal = false">
 		<div id="chapter-selection">
-			<p v-for="(name, index) of Object.keys((story as FiMStoryFull).Chapters)"
+			<p v-for="(name, index) of chapters"
 			   :class="{ current: index === currentChapter }"
 			   @click="() => {
 			   	if (currentChapter !== index) setChapterIndex(index)

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FadeTransition from '@/transitions/FadeTransition.vue';
 
-const props = defineProps({
+defineProps({
 	active: {
 		type: Boolean,
 		default: false,

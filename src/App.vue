@@ -1,37 +1,26 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
 import DragDrop from '@/views/drag.vue';
-import { useFileStore } from './stores/files';
+import { RouterView } from 'vue-router';
+import { useDatabaseStore } from './stores/database';
 import FadeTransition from './transitions/FadeTransition.vue';
-import { provide, reactive } from 'vue';
-import { BookSettings, SaveBookSettings } from './symbols';
-import { BookshelfSettings } from './types';
 
-const files = useFileStore()
-
-let settings = reactive<BookshelfSettings>({
-	Sort: 'Last Accessed'
-})
-if (localStorage.getItem('settings')) settings = JSON.parse(localStorage.getItem('settings') || "{}")
-else localStorage.setItem('settings', JSON.stringify(settings))
-provide(BookSettings, settings)
-provide(SaveBookSettings, () => {
-	localStorage.setItem('settings', JSON.stringify(settings))
-})
+const databaseStore = useDatabaseStore()
 </script>
 
 <template>
-	<router-view v-if="files.browser_supports_indexeddb"
-				 v-slot="{ Component }">
-		<fade-transition mode="out-in">
-			<component :is="Component"></component>
-		</fade-transition>
-	</router-view>
-	<drag-drop v-else></drag-drop>
+	<template v-if="databaseStore.DISABLED === false">
+		<router-view v-slot="{ Component }">
+			<fade-transition mode="out-in">
+				<component :is="Component"></component>
+			</fade-transition>
+		</router-view>
+	</template>
+
+	<template v-else-if="databaseStore.DISABLED === true">
+		<drag-drop></drag-drop>
+	</template>
 
 	<book-component></book-component>
-
-	<div id="modal-teleport"></div>
 </template>
 
 <style lang="scss">
@@ -60,6 +49,7 @@ body {
 
 * {
 	box-sizing: border-box;
+	// outline: 1px solid green;
 }
 
 button {

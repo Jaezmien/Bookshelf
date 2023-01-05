@@ -1,92 +1,58 @@
-<script lang="ts">
-import { useFileStore, LSData, IDBStory } from '@/stores/files'
-import { BookNotification } from '@/symbols'
-import { defineComponent, inject } from 'vue'
-import { IDBLoaderAsync } from '@/composables/idbloader';
-import { FiMFormatType, FiMStoryFull, FiMStoryRaw, FiMStoryType } from '@/libs/FiMParser';
-import StoryView from '@/components/StoryView/index.vue';
+<script lang="ts" setup>
 import Bookshelf from '@/components/Bookshelf.vue';
+import StoryView from '@/components/StoryView/index.vue';
 import { Bookmark, load_bookmark } from '@/libs/Bookmark';
+import { IndexedDBStory, LocalStorageStory, useFileStore } from '@/stores/files';
+import { BookNotification } from '@/symbols';
+import { computed, inject, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-interface IData {
-	storyData: LSData | null,
-	storyContent: IDBStory | null,
-	storyBookmark: Bookmark | null
+const route = useRoute()
+const router = useRouter()
+const fileStore = useFileStore();
+fileStore.load_stories()
+
+const create_notification = inject(BookNotification)!;
+
+const bookmark = ref<Bookmark | null>(null)
+const story_data = ref<LocalStorageStory | null>(null)
+const story_content = ref<IndexedDBStory | null>(null)
+
+function fetch_story(uuid: string) {
+	fileStore.load_file(uuid).then(([data, story]) => {
+		bookmark.value = load_bookmark(data.ID)
+		story_data.value = data;
+		story_content.value = story;
+	}).catch(err => {
+		console.error(err);
+		create_notification("An error has occured while trying to load a story.", 2);
+		router.push("/");
+	});
 }
 
-export default defineComponent({
-	setup() {
-		const fileStore = useFileStore();
-		const create_notification = inject(BookNotification)!;
-		return {
-			fileStore,
-			create_notification,
-		};
-	},
-	data() {
-		return {
-			storyData: null,
-			storyContent: null,
-			storyBookmark: null,
-		} as IData;
-	},
-	computed: {
-		storyLoaded() {
-			return this.storyData && this.storyContent
-		},
-		dataStory(): (FiMStoryType | null) {
-			if (!this.storyLoaded) return null;
-
-			const data = this.storyData! // thank you typescript <3
-			if (data.Format === FiMFormatType.RAW) {
-				return <FiMStoryRaw>{
-					Format: FiMFormatType.RAW,
-					Text: this.storyContent!.Content
-				};
-			}
-			else {
-				return <FiMStoryFull>{
-					Format: data.Format,
-					Title: data.Title,
-					Author: data.Author,
-					Chapters: this.storyContent!.Content
-				};
-			}
-		}
-	},
-	methods: {
-		fetchStory(uuid: string) {
-			this.fileStore.load_file(uuid).then(([data, story]) => {
-				this.storyBookmark = load_bookmark(data.StoryUUID)
-				this.storyData = data;
-				this.storyContent = story;
-			}).catch(err => {
-				console.error(err);
-				this.create_notification("An error has occured while trying to load a story.", 2);
-				this.$router.push("/");
-			});
-		}
-	},
-	async created() {
-		await IDBLoaderAsync();
-		this.$watch(() => this.$route.params, () => {
-			if (this.$route.name !== "Story") return
-			this.fetchStory(this.$route.params.uuid as string);
-		}, { immediate: true });
-	},
-	components: { StoryView, Bookshelf }
+const has_loaded = computed(() => {
+	return story_data.value && story_content.value
 })
+const story_formatteed = computed(() => {
+	if (!story_data.value || !story_content.value) return null
+	return fileStore.convert_local_idb_to_fimstory(story_data.value, story_content.value)
+})
+
+watch(() => route.params, () => {
+	if (route.name !== "Story") return;
+	fetch_story(route.params.id as string)
+}, { immediate: true })
 </script>
 
 <template>
-	<div v-if="storyLoaded">
+	<div v-if="has_loaded">
 		<header>
 			<Bookshelf :clickable="true"
-					   @click="$router.push('/')"></Bookshelf>
+					   @click="router.push('/')"></Bookshelf>
 		</header>
-		<StoryView :filename="storyData!.Filename"
-				   :story="dataStory!"
-				   :bookmark="storyBookmark!">
+		<StoryView :filename="story_data!.Filename"
+				   :story="story_formatteed!"
+				   :bookmark="bookmark!">
 		</StoryView>
 	</div>
 	<div id="story-loading"

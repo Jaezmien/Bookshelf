@@ -1,5 +1,5 @@
-import { onMounted, onUnmounted, ref } from 'vue'
 import type { Ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 export type FileReaderResult = string | ArrayBuffer | null | undefined
 type DropLoaderCallbackFail = (error: any) => void

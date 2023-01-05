@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { FiMStoryType } from '@/libs/FiMParser';
-import { BookshelfChapterInfo } from '@/types';
-import { onMounted, onUnmounted, PropType, ref, nextTick, computed, reactive, watch } from 'vue';
 import FadeTransition from '@/transitions/FadeTransition.vue';
-import FeatherIcon from '../FeatherIcon.vue';
-import gsap from "gsap";
+import { BookshelfChapterInfo } from '@/types';
+import { FIMStory } from 'fimfic-parser';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { computed, nextTick, onMounted, onUnmounted, PropType, ref } from 'vue';
 
 const props = defineProps({
 	filename: {
@@ -13,7 +12,7 @@ const props = defineProps({
 		default: () => '',
 	},
 	story: {
-		type: Object as PropType<FiMStoryType>,
+		type: Object as PropType<FIMStory>,
 		required: true
 	},
 	chapters: {
@@ -87,7 +86,7 @@ onUnmounted(() => {
 			<div v-show="isChapterInRange(currentChapter - 1)"
 				 id="chapter-prev"
 				 @click="$emit('setChapterIndex', currentChapter - 1)">
-				<FeatherIcon :icon="'chevron-left'"></FeatherIcon>
+				<ChevronLeft></ChevronLeft>
 			</div>
 		</FadeTransition>
 
@@ -108,7 +107,7 @@ onUnmounted(() => {
 			<div v-show="isChapterInRange(currentChapter + 1)"
 				 id="chapter-next"
 				 @click="$emit('setChapterIndex', currentChapter + 1)">
-				<FeatherIcon :icon="'chevron-right'"></FeatherIcon>
+				<ChevronRight></ChevronRight>
 			</div>
 		</FadeTransition>
 	</nav>

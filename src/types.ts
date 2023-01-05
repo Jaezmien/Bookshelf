@@ -1,4 +1,4 @@
-import { FiMStoryChapter } from '@/libs/FiMParser'
+import { FIMChapterContents } from 'fimfic-parser'
 
 export type BookNotificationType = (msg: string, type?: number) => void
 
@@ -10,7 +10,7 @@ export interface BookshelfStoryConfig {
 
 export interface BookshelfChapterInfo {
 	Name?: string
-	Text: string[] | FiMStoryChapter
+	Text: FIMChapterContents
 }
 
 export type BookshelfSort = 'Title' | 'Author' | 'Date Added' | 'Last Accessed'

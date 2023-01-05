@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { FiMStoryType, FiMFormatType } from '@/libs/FiMParser';
+import { FIMStory } from 'fimfic-parser';
 import { PropType } from 'vue';
 
-const props = defineProps({
+defineProps({
 	filename: {
 		type: String,
 		requried: true,
 		default: () => '',
 	},
 	story: {
-		type: Object as PropType<FiMStoryType>,
+		type: Object as PropType<FIMStory>,
 		required: true
 	}
 })
 </script>
 
 <template>
-	<section v-if="story.Format !== FiMFormatType.RAW">
+	<section v-if="story.Format !== 'NONE'">
 		<h1 id="story-title">{{ story.Title }}</h1>
 		<p id="story-author">by: {{ story.Author }}</p>
 	</section>
