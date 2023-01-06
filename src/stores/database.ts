@@ -40,6 +40,10 @@ export const useDatabaseStore = defineStore('database', {
 					// @ts-ignore
 					const db = e.target!.result! as IDBDatabase // i have no idea why e.target is result, does IDBVersionChangeEvent not implement it???
 
+					if (e.oldVersion == 1) {
+						db.deleteObjectStore('stories')
+					}
+
 					const stories = db.createObjectStore('stories', { keyPath: 'ID' })
 					stories.createIndex('Content', 'Content', { unique: false })
 					stories.createIndex('ContentHash', 'ContentHash', { unique: true })
