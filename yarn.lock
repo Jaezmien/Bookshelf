@@ -1826,7 +1826,7 @@ fill-range@^7.0.1:
 
 "fimfic-parser@https://github.com/Jaezmien/fimfic-parser":
   version "1.0.0"
-  resolved "https://github.com/Jaezmien/fimfic-parser#a80791a5e9374dc01c70ca6e7e8491be52482bbe"
+  resolved "https://github.com/Jaezmien/fimfic-parser#a32dcae6bf516a24e0d0fa147e079a3ad8ea989a"
   dependencies:
     node-html-parser "^6.1.4"
     typescript "^4.9.4"
