@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { CreateButtonLoader } from '@/composables/droploader';
+import { FIMStory } from 'fimfic-parser';
+import { onMounted, PropType, ref } from 'vue';
 import Bookshelf from './Bookshelf.vue';
 import StoryView from './StoryView/index.vue';
-import { FiMStoryType } from '@/libs/FiMParser';
-import { onMounted, PropType, ref } from 'vue';
-import { CreateButtonLoader } from '@/composables/droploader';
 
 defineProps({
 	story: {
-		type: Object as PropType<FiMStoryType>,
+		type: Object as PropType<FIMStory>,
 		required: true,
 	},
 	filename: {
