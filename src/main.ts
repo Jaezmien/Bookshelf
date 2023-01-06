@@ -26,6 +26,11 @@ app.use(createPinia())
 useSettingStore().load_settings()
 await useDatabaseStore()
 	.initialize_db()
-	.catch(() => {})
+	.catch((err) => {
+		if (err === null) return
+
+		console.error(err)
+		app.config.globalProperties.$book_notification('An error has occured while trying to initialize IndexedDB', 2)
+	})
 
 app.mount('#app')
