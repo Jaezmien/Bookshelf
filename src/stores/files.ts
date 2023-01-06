@@ -224,8 +224,6 @@ export const useFileStore = defineStore('files', {
 				if (story.Format === 'NONE') return res()
 
 				for (const chapter of story.Content) {
-					const nodes = chapter.Contents.filter((c) => typeof c !== 'string')
-
 					for (const url of this.get_html_images(chapter)) {
 						await this.cache_image(url).catch(rej)
 					}

@@ -1,5 +1,8 @@
-import { h, App, reactive, TransitionGroup } from 'vue'
 import { BookNotification } from '@/symbols';
+import { App, h, reactive, TransitionGroup } from 'vue';
+
+// Prevent prettier from deleting `h`
+let _h = h
 
 const rand = (a: number, b: number) => a + Math.floor(Math.random() * (b - a + 1))
 

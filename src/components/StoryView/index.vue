@@ -6,7 +6,7 @@ import { WatchChapterProgress, WatchStoryLastChild } from '@/composables/scrollw
 import { WatchStoryProgress } from '@/composables/storyprogress';
 import { Bookmark, delete_bookmark, save_bookmark } from '@/libs/Bookmark';
 import { useFileStore } from '@/stores/files';
-import { BookNotification } from '@/symbols';
+import { BookImageLoaded, BookNotification } from '@/symbols';
 import PageTransition from '@/transitions/PageTransition.vue';
 import { BookshelfChapterInfo } from '@/types';
 import debounce from "debounce";
@@ -111,7 +111,7 @@ const detectChapterImages = (index: number) => {
 const allImagesHaveLoaded = computed(() => {
 	return props.story.Format === 'HTML' ? loadedImages.value === detectedImages.value : true
 })
-provide('imageHasLoaded', () => { loadedImages.value++ })
+provide(BookImageLoaded, () => { loadedImages.value++ })
 
 // Reset story here
 watch(() => props.story, () => {

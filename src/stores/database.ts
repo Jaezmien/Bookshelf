@@ -28,7 +28,10 @@ export const useDatabaseStore = defineStore('database', {
 				if (this.db) return res(this.db)
 
 				const dbreq = window.indexedDB.open('bookshelf', this.DB_VERSION)
-				dbreq.onerror = (e: Event) => rej(e)
+				dbreq.onerror = (e: Event) => {
+					this.DISABLED = true
+					rej(e)
+				}
 				dbreq.onsuccess = (e: Event) => {
 					this.db = dbreq.result
 					res(dbreq.result)

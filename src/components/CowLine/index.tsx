@@ -1,8 +1,10 @@
 import { useFileStore } from '@/stores/files'
+import { BookImageLoaded } from '@/symbols'
 import { FIMChapterContent, FIMChapterNode } from 'fimfic-parser'
 import { defineComponent, h, inject } from 'vue'
 
-let j = h // prettier won't shut up
+// Prevent prettier from deleting `h`
+let _h = h
 
 function copyObject(obj: any) {
 	return obj && Object.keys(obj).length ? JSON.parse(JSON.stringify(obj)) : {}
@@ -41,7 +43,7 @@ function recursiveRender(content: String | FIMChapterContent, cowline: InstanceT
 const CowImage = defineComponent({
 	setup() {
 		const fileStore = useFileStore()
-		const imageLoad = inject('imageHasLoaded', () => {})
+		const imageLoad = inject(BookImageLoaded, () => {})
 		return {
 			fileStore,
 			imageLoad
@@ -64,7 +66,7 @@ const CowImage = defineComponent({
 	render() {
 		return (
 			<img class='cow-line' src={this.src}
-				onLoad={() => this.imageLoad() }
+				onLoad={() => this.imageLoad(true) }
 			/>
 		)
 	},

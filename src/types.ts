@@ -1,6 +1,7 @@
 import { FIMChapterContents } from 'fimfic-parser'
 
 export type BookNotificationType = (msg: string, type?: number) => void
+export type BookImageLoadedType = (success: boolean) => void
 
 export interface BookshelfStoryConfig {
 	imageFormatFile: string
