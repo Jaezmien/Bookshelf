@@ -55,7 +55,7 @@ export const useFileStore = defineStore('files', {
 					const req = storyStore.get(url) as IDBRequest<IndexedDBImage>
 
 					req.onerror = (e) => rej(e)
-					req.onsuccess = () => res(req.result.Data || url)
+					req.onsuccess = () => res(req.result?.Data || url)
 				})
 			}
 		},
@@ -168,14 +168,17 @@ export const useFileStore = defineStore('files', {
 			return urls
 		},
 
-		add_file(filename: string, story: FIMStory) {
+		add_file(filename: string, story: FIMStory, warn: (msg: string) => void) {
 			return new Promise<[string, boolean]>(async (res, rej) => {
 				const databaseStore = useDatabaseStore()
 				if (!databaseStore.db) return rej('fileStore.add_file was called while the database is null.')
 
 				let [local_info, db_content] = this.generate_data_for_story(filename, story)
 
-				await this.cache_story_images(story).catch(console.error)
+				await this.cache_story_images(story).catch((err) => {
+					warn('Bookshelf could not cache story images!')
+					console.error(err)
+				})
 
 				const i = this.stories.findIndex((data) => data.ID === local_info.ID)
 				if (i > -1) {
@@ -225,7 +228,11 @@ export const useFileStore = defineStore('files', {
 
 				for (const chapter of story.Content) {
 					for (const url of this.get_html_images(chapter)) {
-						await this.cache_image(url).catch(rej)
+						try {
+							await this.cache_image(url)
+						} catch (err) {
+							return rej(err)
+						}
 					}
 				}
 
