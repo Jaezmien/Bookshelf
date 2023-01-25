@@ -1830,11 +1830,10 @@ fill-range@^7.0.1:
     to-regex-range "^5.0.1"
 
 "fimfic-parser@https://github.com/Jaezmien/fimfic-parser":
-  version "1.0.0"
-  resolved "https://github.com/Jaezmien/fimfic-parser#a32dcae6bf516a24e0d0fa147e079a3ad8ea989a"
+  version "1.1.0"
+  resolved "https://github.com/Jaezmien/fimfic-parser#b6301e215e43be89c1292f5f9ecf1b3e4bba2c50"
   dependencies:
     node-html-parser "^6.1.4"
-    typescript "^4.9.4"
 
 fs-extra@^9.0.1:
   version "9.1.0"
@@ -2722,11 +2721,6 @@ typescript@^4.5.4:
   version "4.7.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
-
-typescript@^4.9.4:
-  version "4.9.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.4.tgz#a2a3d2756c079abda241d75f149df9d561091e78"
-  integrity sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
