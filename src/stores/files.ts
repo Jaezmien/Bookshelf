@@ -1,6 +1,5 @@
 import { Buffer } from 'buffer'
 import { FIMChapter, FIMChapterNode, FIMFormat, FIMStory } from 'fimfic-parser'
-import { nanoid } from 'nanoid'
 import { MD5 } from 'object-hash'
 import { defineStore } from 'pinia'
 import { useDatabaseStore } from './database'
@@ -97,12 +96,14 @@ export const useFileStore = defineStore('files', {
 			const databaseStore = useDatabaseStore()
 			if (!databaseStore.db) throw 'fileStore.generate_data_for_story was called while the database is null.'
 
-			const uuid = nanoid()
+			let uuid = ''
 			const timestamp = Date.now()
 
 			let local_storage: LocalStorageStory
 
 			if (story.Format === 'NONE') {
+				uuid = MD5(filename)
+
 				local_storage = {
 					ID: uuid,
 					Filename: filename,
@@ -111,6 +112,8 @@ export const useFileStore = defineStore('files', {
 					Format: story.Format,
 				}
 			} else {
+				uuid = MD5(story.Title + story.Author)
+
 				local_storage = {
 					ID: uuid,
 					Filename: filename,
@@ -120,6 +123,10 @@ export const useFileStore = defineStore('files', {
 					Title: story.Title,
 					Author: story.Author,
 				}
+
+				console.log(story.Title)
+				console.log(story.Author)
+				console.log(uuid)
 			}
 
 			return [
@@ -185,11 +192,15 @@ export const useFileStore = defineStore('files', {
 					const [, _db_content] = await this.load_file(local_info.ID)
 					if (_db_content.ContentHash === db_content.ContentHash) return res([local_info.ID, true])
 
-					const storyStore = databaseStore.db.transaction(['stories'], 'readwrite').objectStore('stories')
-					const req = storyStore.put(db_content) // Update
+					console.log(db_content)
 
-					req.onsuccess = (e) => res([local_info.ID, true])
-					req.onerror = rej
+					const dbTransc = databaseStore.db.transaction(['stories'], 'readwrite')
+					dbTransc.onerror = rej
+
+					const storyStore = dbTransc.objectStore('stories')
+					const transReq = storyStore.put(db_content) // Update
+					transReq.onsuccess = (e) => res([local_info.ID, true])
+					transReq.onerror = rej
 				} else {
 					this.stories.unshift(local_info)
 					localStorage.setItem('stories', JSON.stringify(this.stories))
